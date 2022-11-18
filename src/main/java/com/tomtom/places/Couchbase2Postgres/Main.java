@@ -99,7 +99,7 @@ private static List<String> FailedPlaces=new ArrayList<>();
               //  HttpEntity<String> entity = new HttpEntity<>(placeStr, headers);
                 RestTemplate restTemplate = new RestTemplate();
 
-                restTemplate.postForLocation("http://localhost:9292/fuse-postgres-ws/jobs/cluster-state/save/delta-before", docStr);
+                restTemplate.postForLocation("http://localhost:9292/fuse-postgres-ws/jobs/cluster-state/save", docStr);
 
                 System.out.println(doc.getDocType()+"  doc " + doc.get_id() + " Successfully inserted");
 //
