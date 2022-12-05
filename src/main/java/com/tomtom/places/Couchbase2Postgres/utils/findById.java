@@ -21,25 +21,30 @@ public class findById {
         ch.qos.logback.classic.Logger rootLogger = loggerContext.getLogger("com.couchbase");
         rootLogger.setLevel(Level.WARN); // or INFO or whatever
         //findById findDocument=new findById();
-        System.out.println("Fetch a Document from Couchbase as A String");
-        System.out.println();
 
-        Scanner scanner=new Scanner(new BufferedInputStream(System.in));
-        String id=scanner.next();
-        scanner.close();
+            System.out.println("Fetch a Document from Couchbase as A String");
+            System.out.println();
 
-        JsonObject document=findDoc(id);
+            Scanner scanner = new Scanner(new BufferedInputStream(System.in));
+            String id = scanner.next();
+            scanner.close();
 
-        Gson gson=new GsonBuilder().setPrettyPrinting().create();
+            JsonObject document = findDoc(id);
 
-        System.out.println(gson.toJson(document));
+            Gson gson = new Gson();
+
+            System.out.println(gson.toJson(document));
+
 
     }
 
     public static JsonObject findDoc(String id){
 
-        DataStore sourceDataStore = getDatastore("http://tritest1-813-003.maps-pu-poi-prod.amiefarm.com:8091"
-                , 8091, "places", "places", "places");
+//        DataStore sourceDataStore = getDatastore("http://tritest1-813-003.maps-pu-poi-prod.amiefarm.com:8091"
+//                , 8091, "places", "places", "places");
+
+        DataStore sourceDataStore = getDatastore("http://fuse-production-001.maps-pu-poi-prod.amiefarm.com:8091"
+                , 8091, "places", "tempuser", "tempuser");
 
         JsonObject document=new JsonObject();
         document=sourceDataStore.getDocumentById(id);

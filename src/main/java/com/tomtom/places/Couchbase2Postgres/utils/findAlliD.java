@@ -1,10 +1,8 @@
-package com.tomtom.places.Couchbase2Postgres;
-
+package com.tomtom.places.Couchbase2Postgres.utils;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import com.google.gson.Gson;
-import com.tomtom.places.Couchbase2Postgres.utils.DaoUtil;
 import com.tomtom.places.model.ClusterState;
 import com.tomtom.places.optimus.datastore.DataStore;
 import com.tomtom.places.optimus.datastore.config.DataStoreConfiguration;
@@ -20,15 +18,15 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main {
+public class findAlliD {
 
-private static List<String> FailedPlaces=new ArrayList<>();
+    private static List<String> FailedPlaces=new ArrayList<>();
     public static void main(String args[]) {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         ch.qos.logback.classic.Logger rootLogger = loggerContext.getLogger("com.couchbase");
         rootLogger.setLevel(Level.WARN);
 
-        Main couchbasePuller = new Main();
+        findAlliD couchbasePuller = new findAlliD();
         couchbasePuller.pullData();
         System.out.println("These docs failed:::::::::::");
         FailedPlaces.forEach(place -> System.out.println(place+" failed"));
@@ -55,7 +53,7 @@ private static List<String> FailedPlaces=new ArrayList<>();
         ViewProperties viewProperties=ViewProperties.builder().viewName("search/documents_by_locality")
                 .startKey(DaoUtil.createKey(new Object[]{"IND","CLUSTER_STATE"}))
                 .endKey(DaoUtil.createKeyWithEmptyArrayAsLastElement(new Object[]{"IND","CLUSTER_STATE"}))
-                .pageSize(100000).includeDocs(false).reduce(false).group(false).build();
+                .pageSize(1000000).includeDocs(false).reduce(false).group(false).build();
 
         String pageParam = null;
         Page<ComplexViewResult> placePage = null;
@@ -71,7 +69,7 @@ private static List<String> FailedPlaces=new ArrayList<>();
 
         } while (placePage.isHasNext());
 
-     //   placePage.getResultList().forEach(place -> System.out.println(place.get_id()));
+        //   placePage.getResultList().forEach(place -> System.out.println(place.get_id()));
 
 
 
@@ -89,75 +87,35 @@ private static List<String> FailedPlaces=new ArrayList<>();
         ch.qos.logback.classic.Logger rootLogger2 = loggerContext2.getLogger("org.springframework.web");
         rootLogger2.setLevel(Level.WARN); // or INFO or whatever
 
-        Gson gson = new Gson();
-        //RestTemplate restTemplate = new RestTemplate();
 
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "200");
         docs.parallelStream().forEach(doc -> {
-            try {
-
-//                Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 
-               // String docStr = gson.toJson(doc);
+                // FailedPlaces.add(e.getMessage());
+            //System.out.println(doc.getId());
+             //   FailedPlaces.add(doc.getId());
 
-               // HttpHeaders headers = new HttpHeaders();
-              //  HttpEntity<String> entity = new HttpEntity<>(placeStr, headers);
+                try{
 
-                RestTemplate restTemplate = new RestTemplate();
+                   // FileWriter writer = new FileWriter("failed-ind-cluster-state.txt",true);
+                        FileWriter writer = new FileWriter("C:\\Users\\sajilal\\intern\\Couchbase2Postgres\\completed-cluster-state.txt",true);
 
+                    BufferedWriter buffer = new BufferedWriter(writer);
+                    buffer.write(doc.getId());
+                    buffer.newLine();
+                    //buffer.write(e.getMessage());
+                    //buffer.newLine();
+                    buffer.close();
 
-                Boolean flag=restTemplate.getForObject("http://localhost:9292/fuse-postgres-ws/jobs/cluster-state/check-if-present/"+doc.getId(), Boolean.class);
-                if(!flag){
-                    System.out.println(doc.getId()+"     failed");
-                    try {
-
-                               FileWriter writer = new FileWriter("flag.txt",true);
-                       // FileWriter writer = new FileWriter("C:\\Users\\sajilal\\intern\\Couchbase2Postgres\\flag.txt", true);
-
-                        BufferedWriter buffer = new BufferedWriter(writer);
-                        buffer.write(doc.getId());
-                        buffer.newLine();
-                        //buffer.write(e.getMessage());
-                        //buffer.newLine();
-                        buffer.close();
-
-                    } catch (Exception y) {
-                        System.out.println(y);
-                    }
-                }
-
-//                System.out.println(doc.getDocType()+"  doc " + doc.get_id() + " Successfully inserted");
-////
-//                System.out.println(doc.getDocType()+" migrated ");
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-               // System.out.println(doc.getDocType()+"  doc " + doc.get_id() + "   failed");
-               // FailedPlaces.add(e.getMessage());
-               // FailedPlaces.add(doc.get_id());
-
-//                    try{
-//
-//                        FileWriter writer = new FileWriter("failed-ind-cluster-state.txt",true);
-////                        FileWriter writer = new FileWriter("C:\\Users\\sajilal\\intern\\Couchbase2Postgres\\failed.txt",true);
-//
-//                        BufferedWriter buffer = new BufferedWriter(writer);
-//                        buffer.write(doc.getDocType()+"  "+doc.get_id()+"   failed!!!!!!!!!!");
-//                        buffer.newLine();
-//                        buffer.write(e.getMessage());
-//                        buffer.newLine();
-//                        buffer.close();
-//
-//                    }catch(Exception y)
-//                    {System.out.println(y);}
+                }catch(Exception y)
+                {System.out.println(y);}
 
 
 
 
 
-                }
-        } );
 
-
-    }
+    });
+}
 }
