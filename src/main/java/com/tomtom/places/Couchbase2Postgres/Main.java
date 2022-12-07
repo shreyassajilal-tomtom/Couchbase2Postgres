@@ -19,8 +19,11 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
+
+    private static AtomicInteger count=new AtomicInteger(0);
 
 private static List<String> FailedPlaces=new ArrayList<>();
     public static void main(String args[]) {
@@ -30,9 +33,9 @@ private static List<String> FailedPlaces=new ArrayList<>();
 
         Main couchbasePuller = new Main();
         couchbasePuller.pullData();
-        System.out.println("These docs failed:::::::::::");
-        FailedPlaces.forEach(place -> System.out.println(place+" failed"));
-        System.out.println(":::::::::"+FailedPlaces.size()+" number of docs failed:::::::::::");
+       // System.out.println("These docs failed:::::::::::");
+       // FailedPlaces.forEach(place -> System.out.println(place+" failed"));
+        System.out.println(":::::::::"+ count+" number of docs failed:::::::::::");
 
 
     }
@@ -53,13 +56,14 @@ private static List<String> FailedPlaces=new ArrayList<>();
 //            , 8091, "places", "admin", "postgres");
 
         ViewProperties viewProperties=ViewProperties.builder().viewName("search/documents_by_locality")
-                .startKey(DaoUtil.createKey(new Object[]{"IND","CLUSTER_STATE"}))
-                .endKey(DaoUtil.createKeyWithEmptyArrayAsLastElement(new Object[]{"IND","CLUSTER_STATE"}))
+                .startKey(DaoUtil.createKey(new Object[]{"IND","CLUSTER"}))
+                .endKey(DaoUtil.createKeyWithEmptyArrayAsLastElement(new Object[]{"IND","CLUSTER"}))
                 .pageSize(100000).includeDocs(false).reduce(false).group(false).build();
 
         String pageParam = null;
         Page<ComplexViewResult> placePage = null;
         int inserted = 0;
+
         do {
             placePage = sourceDataStore.getComplexViewPaginatedResults(viewProperties, ComplexViewResult.class);
             postgresInsert(placePage.getResultList());
@@ -92,7 +96,8 @@ private static List<String> FailedPlaces=new ArrayList<>();
         Gson gson = new Gson();
         //RestTemplate restTemplate = new RestTemplate();
 
-        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "200");
+
+        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "500");
         docs.parallelStream().forEach(doc -> {
             try {
 
@@ -107,12 +112,13 @@ private static List<String> FailedPlaces=new ArrayList<>();
                 RestTemplate restTemplate = new RestTemplate();
 
 
-                Boolean flag=restTemplate.getForObject("http://localhost:9292/fuse-postgres-ws/jobs/cluster-state/check-if-present/"+doc.getId(), Boolean.class);
+                Boolean flag=restTemplate.getForObject("http://localhost:9292/fuse-postgres-ws/jobs/cluster/check-if-present/"+doc.getId(), Boolean.class);
                 if(!flag){
                     System.out.println(doc.getId()+"     failed");
+                    count.getAndIncrement();
                     try {
 
-                               FileWriter writer = new FileWriter("flag.txt",true);
+                               FileWriter writer = new FileWriter("flag-cluster.txt",true);
                        // FileWriter writer = new FileWriter("C:\\Users\\sajilal\\intern\\Couchbase2Postgres\\flag.txt", true);
 
                         BufferedWriter buffer = new BufferedWriter(writer);
