@@ -11,4 +11,8 @@
   This lets parallelStream() utilise any number of threads.
   Currenty utilises 1000 threads.
   
+ ### Other branches of Repo
+  Main - Data migration from couchbase to postgres.
+  checkmissing- gets only IDs of a view from couchbase and checks if all are there in postgres database(multithreaded).
+  insertmissing- input a txt file with ids of documents, fetches them and inserts into postgres (multithreaded).
   
