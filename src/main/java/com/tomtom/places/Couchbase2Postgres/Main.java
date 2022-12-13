@@ -29,6 +29,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class Main {
 
+    AtomicLong count=new AtomicLong(0);
+
 private static List<String> FailedPlaces=new ArrayList<>();
 
     DataStore sourceDataStore = getDatastore("http://fuse-production-001.maps-pu-poi-prod.amiefarm.com:8091"
@@ -75,7 +77,7 @@ private static List<String> FailedPlaces=new ArrayList<>();
 
 
         final int batchSize = 1000;
-        Path file = Paths.get("flag.txt");
+        Path file = Paths.get("flag-cluster.txt");
 
         try (BufferedReader bfr = Files.newBufferedReader(file)) {
             List<String> batch = new ArrayList<>(batchSize);
@@ -124,7 +126,6 @@ private static List<String> FailedPlaces=new ArrayList<>();
         Gson gson = new Gson();
         //RestTemplate restTemplate = new RestTemplate();
 
-        AtomicLong count=new AtomicLong(0);
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "1000");
         docIDs.parallelStream().forEach(docID -> {
             try {
@@ -142,7 +143,7 @@ private static List<String> FailedPlaces=new ArrayList<>();
                 RestTemplate restTemplate = new RestTemplate();
 
 
-                restTemplate.postForLocation("http://localhost:9292/fuse-postgres-ws/jobs/cluster-state/save/",docStr);
+                restTemplate.postForLocation("http://localhost:9292/fuse-postgres-ws/jobs/cluster/save/",docStr);
                 //System.out.println(docID);
 
 
@@ -158,7 +159,7 @@ private static List<String> FailedPlaces=new ArrayList<>();
 
                     try{
 
-                        FileWriter writer = new FileWriter("failed-re-migrate-2.txt",true);
+                        FileWriter writer = new FileWriter("failed-re-migrate-cluster.txt",true);
 //                        FileWriter writer = new FileWriter("C:\\Users\\sajilal\\intern\\Couchbase2Postgres\\failed.txt",true);
 
                         BufferedWriter buffer = new BufferedWriter(writer);
