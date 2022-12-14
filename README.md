@@ -1,5 +1,5 @@
 # Couchbase2Postgres
-  Fetches List of Doc IDs and then pulls them by ID from couchbase according to the view parameters.<br />
+  Fetches Docs from couchbase according to the view parameters.<br />
   Then sends the documents as POST request to fuse-postgres web service<br />
   
   Currently doc type needs to be set manually and some corresponding changes need to be done
